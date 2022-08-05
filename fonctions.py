@@ -4,13 +4,43 @@ from tkinter.scrolledtext import ScrolledText
 import serial
 
 font = ("Futura", 12)
+font_port = ("Courier", 10)
+out = 0
+
+#reference : https://www.youtube.com/watch?v=-SoEHsNKVpw
 
 def connect(input):
     popup = tk.Tk()
     popup.title('Banc de test cartes de flash v0.1')
     popup.geometry('600x400+100+50')
+    popup.columnconfigure(0, weight=4)
 
-    ttk.Label(popup, text="Connect to port {0}".format(input)).pack()
+    popup.rowconfigure(1, weight=5)
+    ser = serial.Serial(input, 115000, timeout=20)  # open serial port
+
+
+
+
+    ttk.Label(popup, text="Connected to port {0}".format(input)).grid(column=0, row=0)
+    exit = ttk.Button(popup, text="Exit", command=lambda : disconnect(popup))
+    exit.grid(column=1, row=0)
+
+    st = ScrolledText(popup, width=500, height=100)
+    st.grid(column=0, row=1, columnspan=2)
+
+    while True:
+        popup.update()
+        checkPorts(popup, ser, st)
+
+def checkPorts(window, port ,text ):
+    if port.is_open and port.in_waiting:
+        text.insert(1.0, port.readline())
+
+
+
+def disconnect(window):
+    window.destroy()
+    out = 1
 
 #fonctions attached
 # def click() :

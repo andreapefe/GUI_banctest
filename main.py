@@ -3,7 +3,8 @@ from tkinter import ttk
 from tkinter.scrolledtext import ScrolledText
 import serial
 import fonctions as f
-from PIL import Image, ImageTk
+from PIL import Image
+from PIL import ImageTk
 
 #create object to view objects
 root = tk.Tk()
@@ -16,10 +17,10 @@ serial_port = tk.StringVar()
 
 #attributes of the window
 root.title('Banc de test cartes de flash v0.1')
-root.geometry('600x400+100+50')
+root.geometry('1200x600+100+50')
 
 #Importation de l'image avec PIL et conversion
-im = Image.open('logo-batconnect-vertical(1).png')
+im = Image.open('./assets/logo-batconnect-vertical(1).png')
 logo = ImageTk.PhotoImage(im, master=root)
 
 #Création du canevas et affichage de l'image
@@ -28,7 +29,7 @@ logo1 = dessin.create_image(0,0, anchor = tk.NW, image = logo)
 dessin.grid()
 
 #ajout du logo batconnect à la fenêtre
-root.iconbitmap("logo-batconnect-vertical_1_.ico")
+#root.iconbitmap("logo-batconnect-vertical_1_.ico")
 
 # place labels and buttons on the root window
 ttk.Label(root, text="Application de Banc de test pour tracker et batterie", font=("Futura", 14)).grid(row=0,column=0, columnspan=2, ipady=10, sticky=tk.NS)
@@ -48,4 +49,6 @@ ttk.Label(root, text="Andrea Pérez Fernández, Léa Scheer - 2022", font=("Futu
 #f.read_serial()
 #Maintain window open
 
-root.mainloop()
+while True:
+    root.update()
+
