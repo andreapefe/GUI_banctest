@@ -28,14 +28,23 @@ def connect(input):
     st = ScrolledText(popup, width=500, height=100)
     st.grid(column=0, row=1, columnspan=2)
 
+    input = tk.Text(popup, width=100, height=1)
+    input.grid(column=0, row=2, pady=50)
+
     while True:
         popup.update()
         checkPorts(popup, ser, st)
 
+
+
+#CHeck if there are things to print on the scree
 def checkPorts(window, port ,text ):
     if port.is_open and port.in_waiting:
         text.insert(1.0, port.readline())
 
+#send what we write in the input bar
+def Send():
+    a = 0
 
 
 def disconnect(window):
