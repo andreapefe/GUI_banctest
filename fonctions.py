@@ -3,23 +3,20 @@ from tkinter import ttk
 from tkinter.scrolledtext import ScrolledText
 import serial
 
-font = ("Futura", 12)
+
 font_port = ("Courier", 10)
 out = 0
 
 #reference : https://www.youtube.com/watch?v=-SoEHsNKVpw
 
 def connect(input):
-    popup = tk.Tk()
-    popup.title('Banc de test cartes de flash v0.1')
-    popup.geometry('600x400+100+50')
-    popup.columnconfigure(0, weight=4)
-
-    popup.rowconfigure(1, weight=5)
+    # popup = tk.Tk()
+    # popup.title('Banc de test cartes de flash v0.1')
+    # popup.geometry('600x400+100+50')
+    # popup.columnconfigure(0, weight=4)
+    #
+    # popup.rowconfigure(1, weight=5)
     ser = serial.Serial(input, 115000, timeout=20)  # open serial port
-
-
-
 
     ttk.Label(popup, text="Connected to port {0}".format(input)).grid(column=0, row=0)
     exit = ttk.Button(popup, text="Exit", command=lambda : disconnect(popup))
@@ -59,7 +56,6 @@ def disconnect(window):
 #     for i in range(0,10):
 #         st.insert('{0}.0'.format(i), 'Try numero {0}\n'.format(i))
 #     print('Clicked')
-
 
 
 #ouverture du port série
