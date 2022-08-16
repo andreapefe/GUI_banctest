@@ -51,11 +51,21 @@ def connect():
 
 
 def disconnect():
-    return 1
+    try:
+        serial_object.close()
+        Label(root, text="Disconnected", fg='red').place(x=870, y=220)
+
+
+    except AttributeError:
+        print
+        "Closed without Using it -_-"
+
+    #application is closed -> update to only close connection and not kill the interface
+    root.close()
 
 def send():
     send_data = data_entry.get()
-    line = "\n"
+    line = "\r"
     send_data += line
     #print(send_data)
 
