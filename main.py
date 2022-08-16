@@ -22,6 +22,7 @@ filter_data = ''
 update_period = 5
 serial_object = None
 root = tk.Tk()
+new_data = False
 
 
 
@@ -34,12 +35,9 @@ def connect():
     port = port_entry.get()
     baud = baud_entry.get()
 
-
-
-
     try:
         try:
-            serial_object = serial.Serial('/dev/tty' + str(port), baud)
+            serial_object = serial.Serial('/dev/tty' + str(port), baud, rtscts=False, dsrdtr=False)
             # print info about port connection
             Label(root, text="Connected", fg='green').place(x=870, y=220)
         except:
@@ -48,6 +46,7 @@ def connect():
         print("Enter Baud and Port")
         return
 
+
     t1.start()
 
 
@@ -55,21 +54,33 @@ def disconnect():
     return 1
 
 def send():
-    return 1
+    send_data = data_entry.get()
+    line = "\n"
+    send_data += line
+    #print(send_data)
+
+    if not send_data:
+        Label(root, text="No data to send", fg='red').place(x=600, y=532)
+
+    serial_object.write(send_data.encode())
+    print(send_data.encode('ascii'))
+    a = 0
+
 
 def update_gui():
     global filter_data
     global update_period
+    global new_data
+
     st.place(x=25, y=260)
     new = time.time()
 
 
 
     while(1):
-        #st.insert(END, "Running\n")
-        if filter_data:
+        if new_data:
             st.insert(END, filter_data)
-            st.insert(END, "\n")
+            new_data = False
 
 
 def get_data():
@@ -79,18 +90,20 @@ def get_data():
     """
     global serial_object
     global filter_data
-
-    #Label(root, text="Getting data", fg='green').place(x=600, y=220)
+    global serial_data
+    global new_data
 
     while (1):
         try:
-            serial_data = serial_object.readline().strip('\n').strip('\r')
-
-            filter_data = serial_data.split(',')
-            print
-            filter_data
+            if serial_object.in_waiting > 0:
+                serial_data = serial_object.readline()
+                print(serial_data)
+                filter_data = serial_data.decode('ascii')
+                new_data = True
+                Label(root, text="Getting data", fg='green').place(x=600, y=220)
 
         except TypeError:
+            Label(root, text="ERROR", fg='red').place(x=600, y=220)
             pass
 
 
@@ -99,8 +112,6 @@ if __name__ == "__main__":
     # Window configuration
     root.title('Banc de test cartes de flash v0.1')
 
-    t1 = threading.Thread(target=get_data)
-    t1.daemon = True
 
 
     #frames
@@ -109,6 +120,8 @@ if __name__ == "__main__":
     frame_input = tk.Frame(height=150, width=970, bd=3, relief='groove').place(x=15, y=615)
     st = ScrolledText(root, width=116,  height=14)
 
+    t1 = threading.Thread(target=get_data)
+    t1.daemon = True
 
     t2 = threading.Thread(target = update_gui)
     t2.daemon = True
@@ -140,7 +153,6 @@ if __name__ == "__main__":
     data_entry = Entry(width=43)
     data_entry.place(x=85, y=532)
 
-
     #main loop
     root.geometry('1000x780+100+50')
     root.mainloop()
@@ -154,10 +166,7 @@ if __name__ == "__main__":
     # serial_port = tk.StringVar()
     #
     # #attributes of the window
-    #
 
-
-    #
     # #ajout du logo batconnect à la fenêtre
     # #root.iconbitmap("logo-batconnect-vertical_1_.ico")
     #
