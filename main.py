@@ -43,15 +43,16 @@ def connect():
     if os_name == "Linux":
         try:
             try:
-                serial_object = serial.Serial('dev/tty' + str(port), baud, rtscts=False, dsrdtr=False)
+                serial_object = serial.Serial('/dev/tty' + str(port), baud, rtscts=False, dsrdtr=False)
                 # print info about port connection
-                Label(root, text="Connected", fg='green').place(x=870, y=220)
-                if t1.is_alive():
+                Label(root, text="Connected", fg='green', padx=20).place(x=870, y=220)
+                if t1.ident != None:
                     Alive = True
                 else :
                     t1.start()
             except:
                 print("Cant Open Specified Port")
+
         except ValueError:
             print("Enter Baud and Port")
             return
@@ -62,7 +63,7 @@ def connect():
             try:
                 serial_object = serial.Serial(str(port), baud, rtscts=False, dsrdtr=False)
                 # print info about port connection
-                if t1.is_alive():
+                if t1.ident != None:
                     Alive = True
                 else :
                     t1.start()
@@ -73,8 +74,6 @@ def connect():
             print("Enter Baud and Port")
             return
     
-   
-
 
 def disconnect():
     global Alive
@@ -111,12 +110,12 @@ def update_gui():
 
     st.place(x=25, y=260)
 
-
-    while(Alive):
-        if new_data:
-            st.insert(END, filter_data)
-            st.see('end')
-            new_data = False
+    while(1):
+        while(Alive):
+            if new_data:
+                st.insert(END, filter_data)
+                st.see('end')
+                new_data = False
 
 
 def get_data():
@@ -129,22 +128,23 @@ def get_data():
     global serial_data
     global new_data
 
-    while (Alive):
-        try:
-            if serial_object.in_waiting > 0:
-                serial_data = serial_object.readline()
-                #print(serial_data)
-                filter_data = serial_data.decode('ascii')
-                if f.is_spy(filter_data):
-                    (id, mask) = f.info_filter(filter_data)
-                    ttk.Label(root, text=id, font=("Futura", 10), background="white").place(x=630, y=671)
-                    ttk.Label(root, text=mask, font=("Futura", 10), background="white").place(x=630, y=720)
-                new_data = True
-                Label(root, text="Getting data", fg='green').place(x=600, y=220)
+    while(1):
+        while (Alive):
+            try:
+                if serial_object.in_waiting > 0:
+                    serial_data = serial_object.readline()
+                    #print(serial_data)
+                    filter_data = serial_data.decode('ascii')
+                    if f.is_spy(filter_data):
+                        (id, mask) = f.info_filter(filter_data)
+                        ttk.Label(root, text=id, font=("Futura", 10), background="white").place(x=630, y=671)
+                        ttk.Label(root, text=mask, font=("Futura", 10), background="white").place(x=630, y=720)
+                    new_data = True
+                    Label(root, text="Getting data", fg='green').place(x=600, y=220)
 
-        except TypeError:
-            Label(root, text="ERROR", fg='red').place(x=600, y=220)
-            pass
+            except TypeError:
+                Label(root, text="ERROR", fg='red').place(x=600, y=220)
+                pass
 
 
 if __name__ == "__main__":
