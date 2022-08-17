@@ -14,8 +14,8 @@ from PIL import ImageTk
 import fonctions as f
 
 import threading
-import time
 import os
+import platform
 
 
 # Global variables
@@ -25,6 +25,8 @@ update_period = 5
 serial_object = None
 root = tk.Tk()
 new_data = False
+os_name = ""
+Alive = True
 
 
 
@@ -34,35 +36,59 @@ font = ("Futura", 12)
 #function definition
 def connect():
     global serial_object
+    global Alive
     port = port_entry.get()
     baud = baud_entry.get()
-
-    try:
+    
+    if os_name == "Linux":
         try:
-            serial_object = serial.Serial('/dev/tty' + str(port), baud, rtscts=False, dsrdtr=False)
-            # print info about port connection
-            Label(root, text="Connected", fg='green').place(x=870, y=220)
-        except:
-            print("Cant Open Specified Port")
-    except ValueError:
-        print("Enter Baud and Port")
-        return
-
-    t1.start()
+            try:
+                serial_object = serial.Serial('dev/tty' + str(port), baud, rtscts=False, dsrdtr=False)
+                # print info about port connection
+                Label(root, text="Connected", fg='green').place(x=870, y=220)
+                if t1.is_alive():
+                    Alive = True
+                else :
+                    t1.start()
+            except:
+                print("Cant Open Specified Port")
+        except ValueError:
+            print("Enter Baud and Port")
+            return
+        
+    elif os_name == "Windows":
+        #print("Windows")
+        try:
+            try:
+                serial_object = serial.Serial(str(port), baud, rtscts=False, dsrdtr=False)
+                # print info about port connection
+                if t1.is_alive():
+                    Alive = True
+                else :
+                    t1.start()
+                Label(root, text="Connected", fg='green', padx=20).place(x=870, y=220)
+            except:
+                print("Cant Open Specified Port")
+        except ValueError:
+            print("Enter Baud and Port")
+            return
+    
+   
 
 
 def disconnect():
+    global Alive
+    #Standby on threads
+    Alive = False
     try:
         serial_object.close()
-        Label(root, text="Disconnected", fg='red').place(x=870, y=220)
-
-
+        Label(root, text="Disconnected", fg='red', padx=10).place(x=870, y=220)
     except AttributeError:
         print
         "Closed without Using it -_-"
-
+        
     #application is closed -> update to only close connection and not kill the interface
-    root.quit()
+    #root.quit()
 
 def send():
     send_data = data_entry.get()
@@ -84,11 +110,9 @@ def update_gui():
     global new_data
 
     st.place(x=25, y=260)
-    new = time.time()
 
 
-
-    while(1):
+    while(Alive):
         if new_data:
             st.insert(END, filter_data)
             st.see('end')
@@ -105,11 +129,11 @@ def get_data():
     global serial_data
     global new_data
 
-    while (1):
+    while (Alive):
         try:
             if serial_object.in_waiting > 0:
                 serial_data = serial_object.readline()
-                print(serial_data)
+                #print(serial_data)
                 filter_data = serial_data.decode('ascii')
                 if f.is_spy(filter_data):
                     (id, mask) = f.info_filter(filter_data)
@@ -124,6 +148,9 @@ def get_data():
 
 
 if __name__ == "__main__":
+    
+    #get operating system
+    os_name = platform.system()
 
     # Window configuration
     root.title('Banc de test cartes de flash v0.1')
@@ -132,7 +159,7 @@ if __name__ == "__main__":
     frame_banner = tk.Frame(height=185, width=970, bd=3, relief='groove').place(x=15, y=5)
     frame_data = tk.Frame(height=400, width=970, bd=3, relief='groove').place(x=15, y=200)
     frame_input = tk.Frame(height=150, width=480, bd=3, relief='groove').place(x=15, y=615)
-    frame_filter = tk.Frame(height=150, width=480, bd=3, relief='groove').place(x=505, y=615)
+    frame_filter = tk.Frame(height=150, width=480, bd=3, relief='groove').place(x=505, y=615) 
     st = ScrolledText(root, width=116,  height=14)
 
     t1 = threading.Thread(target=get_data)
@@ -147,7 +174,7 @@ if __name__ == "__main__":
     logo = ImageTk.PhotoImage(im, master=root)
     dessin = tk.Canvas(root, width = im.size[0], height = im.size[1])
     logo1 = dessin.create_image(0,0, anchor = tk.NW, image = logo)
-    dessin.place(x=30, y=18)
+    dessin.place(x=30, y=17)
     ttk.Label(root, text="Application de Banc de test pour tracker et batterie", font=("Futura", 14)).place(x=300, y=70)
     ttk.Label(root, text="Batconnect - 2022", font=("Futura", 10)).place(x=480, y=100)
 
