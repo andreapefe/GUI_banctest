@@ -16,6 +16,7 @@ import fonctions as f
 import threading
 import os
 import platform
+import time
 
 
 # Global variables
@@ -135,16 +136,17 @@ def get_data():
                     serial_data = serial_object.readline()
                     #print(serial_data)
                     filter_data = serial_data.decode('ascii')
-                    if f.is_spy(filter_data):
-                        (id, mask) = f.info_filter(filter_data)
-                        ttk.Label(root, text=id, font=("Futura", 10), background="white").place(x=630, y=671)
-                        ttk.Label(root, text=mask, font=("Futura", 10), background="white").place(x=630, y=720)
+                    # if f.is_spy(filter_data):
+                    #     (id, mask) = f.info_filter(filter_data)
+                    #     ttk.Label(root, text=id, font=("Futura", 10), background="white").place(x=630, y=671)
+                    #     ttk.Label(root, text=mask, font=("Futura", 10), background="white").place(x=630, y=720)
                     new_data = True
-                    Label(root, text="Getting data", fg='green').place(x=600, y=220)
 
             except TypeError:
                 Label(root, text="ERROR", fg='red').place(x=600, y=220)
                 pass
+
+            time.sleep(0.2)
 
 
 if __name__ == "__main__":
