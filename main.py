@@ -136,10 +136,10 @@ def get_data():
                     serial_data = serial_object.readline()
                     #print(serial_data)
                     filter_data = serial_data.decode('ascii')
-                    # if f.is_spy(filter_data):
-                    #     (id, mask) = f.info_filter(filter_data)
-                    #     ttk.Label(root, text=id, font=("Futura", 10), background="white").place(x=630, y=671)
-                    #     ttk.Label(root, text=mask, font=("Futura", 10), background="white").place(x=630, y=720)
+                    if f.is_spy(filter_data):
+                        (id, mask) = f.info_filter(filter_data)
+                        ttk.Label(root, text=id, font=("Futura", 10), background="white").place(x=630, y=671)
+                        ttk.Label(root, text=mask, font=("Futura", 10), background="white").place(x=630, y=720)
                     new_data = True
 
             except TypeError:
@@ -147,6 +147,9 @@ def get_data():
                 pass
 
             time.sleep(0.2)
+
+def clean():
+    st.delete(1.0, END)
 
 
 if __name__ == "__main__":
@@ -196,6 +199,7 @@ if __name__ == "__main__":
     button1 = ttk.Button(root, text="Send", command=send, width=6).place(x=485, y=530)
     data_entry = Entry(width=43)
     data_entry.place(x=85, y=532)
+    ttk.Button(root, text="Clean", command=clean, width=6).place(x=750, y=530)
 
     #filter information
     ttk.Label(root, text="CAN Filter Configuration", font=font).place(x=525, y=625)
